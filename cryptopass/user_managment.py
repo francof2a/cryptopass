@@ -7,11 +7,12 @@ Created on Thu Jan 25 14:20:04 2018
 """
 import pandas as pd
 from time import gmtime, strftime
-import encrypt
+from . import encrypt
 
 _SEP_ = ';'
-_USERS_DB_DEFAULT_ = '../database/users_db.dat'
-_PASS_DB_DEFAULT_ = '../database/pass_db.dat'
+_WORK_FOLDER_='./database/'
+_USERS_DB_DEFAULT_ = _WORK_FOLDER_ + 'users_db.dat'
+_PASS_DB_DEFAULT_ = _WORK_FOLDER_ + 'pass_db.dat'
 
 
 

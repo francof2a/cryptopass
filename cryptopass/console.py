@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import user_managment as um
-import encrypt
+from . import user_managment as um
+from . import encrypt
 import pyperclip
 import getpass as gp
 from time import gmtime, strftime
+import os
 
 
 def input_data(cryptopass_user='skynet', exclude=[]):
@@ -74,6 +75,7 @@ def crypto_cmd_h(user,
     print('\t p: \tGet a password for a given label.')
     print('\t p?: \tGet a password for a given label. Copied to clipboard only.')
     print('\t time: \tCalculate encryptio-decryption performance.')
+    print('\t wd: \tPrint path of working directory.')
     
     print('\n')
 
@@ -86,7 +88,8 @@ def crypto_cmd_all(user,
     
     salt = um.get_user_salt(user,user_database)
     found = um.get_valid_entries(cryptopass_password, salt, pass_database)
-    print(found[['label','password','date_time']])
+    if not found.empty: print(found[['label','password','date_time']])
+    else: print('\t No entries found!')
     
     print('\n')
 
@@ -99,8 +102,10 @@ def crypto_cmd_All(user,
     
     salt = um.get_user_salt(user,user_database)
     found = um.get_valid_entries(cryptopass_password, salt, pass_database)
-    print(found)
+    if not found.empty: print(found)
+    else: print('\t No entries found!')
     
+  
     print('\n')
     
 def crypto_cmd_all_hints(user,
@@ -112,7 +117,9 @@ def crypto_cmd_all_hints(user,
     
     salt = um.get_user_salt(user,user_database)
     found = um.get_valid_entries(cryptopass_password, salt, pass_database)
-    print(found[['label','hint','date_time']])
+    
+    if not found.empty: print(found[['label','hint','date_time']])
+    else: print('\t No entries found!')
     
     print('\n')
     
@@ -121,32 +128,6 @@ def crypto_cmd_dbg(user,
                    user_database=um._USERS_DB_DEFAULT_, 
                    pass_database=um._PASS_DB_DEFAULT_):
     # put here the script for debug
-    
-    
-#    salt = um.get_user_salt(user)
-#    
-#    cryptopass_password = input('> password: ')
-#    user_key = encrypt.get_key(cryptopass_password, salt)
-    
-#    field = input('field: ')
-#    
-#    value = input('value: ')
-    
-#    cryptopass_user_encrypted = encrypt.encrypt_str(user_key, cryptopass_user)
-#    print(cryptopass_user_encrypted)
-#    
-#    cryptopass_password = input('password: ')
-#    user_key = encrypt.get_key(cryptopass_password, salt)
-#    
-#    cryptopass_user_decrypted = encrypt.decrypt_str(user_key, cryptopass_user_encrypted)
-#    print(cryptopass_user_decrypted)
-    
-#    found = um.decrypt_entry_with(cryptopass_password, salt, um._PASS_DB_DEFAULT_, field, value)
-#    print(found)
-#    
-    
-#    ui = um.update_user(cryptopass_user,changes={'notes': '123','counter': 2, 'database': './root'})
-#    print(ui)
 
     return
 
@@ -177,12 +158,14 @@ def crytpo_cmd_p(user,
                                   pass_database,
                                   'label',
                                   label)
-    found_oldest = um.get_last_entry(found)
-    print(found_oldest[['password','date_time']])
-    
-    found_password = found_oldest['password'][0]
-    pyperclip.copy(found_password)
-    print('\t password copied to clipboard!')
+    if not found.empty: 
+        found_oldest = um.get_last_entry(found)
+        print(found_oldest[['password','date_time']])
+        
+        found_password = found_oldest['password'][0]
+        pyperclip.copy(found_password)
+        print('\t password copied to clipboard!')
+    else: print('\t No entries found!')
     
     print('\n')
     return
@@ -201,12 +184,14 @@ def crytpo_cmd_px(user,
                                   pass_database,
                                   'label',
                                   label)
-    found_oldest = um.get_last_entry(found)
-    print(found_oldest[['date_time']])
     
-    found_password = found_oldest['password'][0]
-    pyperclip.copy(found_password)
-    print('\t password copied to clipboard!')
+    if not found.empty: 
+        found_oldest = um.get_last_entry(found)
+        print(found_oldest[['date_time']])
+        found_password = found_oldest['password'][0]
+        pyperclip.copy(found_password)
+        print('\t password copied to clipboard!')
+    else: print('\t No entries found!')
     
     print('\n')
     return
@@ -221,6 +206,12 @@ def crytpo_cmd_time(user,
     if test_str == '': test_str = 'testing cryptopass'
     encrypt.get_password_performance_time(cryptopass_password)
     
+    return
+
+def crypto_cmd_wd(user,
+                 user_database=um._USERS_DB_DEFAULT_, 
+                 pass_database=um._PASS_DB_DEFAULT_):
+    print('\t Working dir = {}'.format(os.getcwd()))
     return
 
 
@@ -238,7 +229,8 @@ def call_crytpo_cmd(user,
                        'np': crypto_cmd_new_pass,
                        'p': crytpo_cmd_p,
                        'p?': crytpo_cmd_px,
-                       'time': crytpo_cmd_time}
+                       'time': crytpo_cmd_time,
+                       'wd': crypto_cmd_wd}
     
     if cmd in crypto_cmd_dict:
         crypto_cmd_dict[cmd](user, user_database, pass_database)
@@ -249,17 +241,22 @@ def call_crytpo_cmd(user,
 
 def main():
     #%% Console starting message
-    print('Cryptopass - version {}'.format(__import__('__init__').__version__))
+    print('Cryptopass - version {}'.format(__import__('cryptopass').__version__))
     
     #%% init
+    work_folder = um._WORK_FOLDER_
     user_db = um._USERS_DB_DEFAULT_
-    pass_db = um._PASS_DB_DEFAULT_    
+    pass_db = um._PASS_DB_DEFAULT_
+    
+    if not os.path.exists(work_folder):
+        os.makedirs(work_folder)
+        print('\t Work folder "{}" created.'.format(work_folder))
     
     user_db_ok = um.test_users_database(user_db)
     if user_db_ok:
         udb = um.load_users_database(user_db)
     else:
-        print('User database error!')
+        print('\t User database error!')
     
     #%% Console   
     cryptopass_user = input('> cryptopass user: ')
@@ -277,7 +274,7 @@ def main():
         if pass_db_ok:
             pdb = um.load_passwords_database(pass_db) # not necessary by now
         else:
-            print('Passwords database error!')
+            print('\t Passwords database error!')
         
         while loop:
             crypto_cmd = input('> enter crypto command (press h for help): ')
@@ -303,4 +300,7 @@ def main():
 
 
 #%% Running console
-main()
+#main()
+    
+if __name__ == "__main__":
+    main()
