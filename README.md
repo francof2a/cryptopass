@@ -24,25 +24,42 @@ The dependecies (python modules) are:
 * pandas
 * pyperclip
 
+In windows OS execute in command windows:
+```
+python -m pip install cryptopass
+```
+
+If you have Anaconda, **cryptopass** executable will be installed in _Scripts_ folder.
+
+
 ## baby steps
 ### creating users
 When you run **cryptopass** in the console:
 
 ```
-Cryptopass - version 0.0.9
-OK database file: ./database/users_db.dat
+Cryptopass - version 0.0.10
+OK database file: ./database/default.udb
 
-> cryptopass user:
+	 Working directory: ./database/
+> enter console command (press h for help):
 ```
+A _console command_ is requested. By now, just enter **login** command.
+```
+> cryptopass user: 
+```
+Cryptopass user is your *session name*. You will access to database for that session. You can have a lot of users. 
+Database for users will be checked to know if the username exist, if not you will can create new one.
+
+We will start with _ElonM_:
 ```
 	 User "ElonM" has not been found!
 	 Do you want create new user? [y/n]: 
 ```
-Cryptopass user is your *session name*. You will access to database for that session. You can have a lot of users. Database for users will be checked to know if the username exist, if not you will can create new one.
+Of course, y (yes):
 
 ```
 	 Creating new user...
-	 if database left clear, it will be: ./database/pass_db.dat
+	 if database left clear, it will be: <working dir>/default.pdb
 
 database = 
 notes = examples
@@ -54,11 +71,14 @@ The _database_ is requested here is the filename for the encrypted database whic
 If your username is already load, you will see:
 
 ```
-OK database file: ./database/pass_db.dat
+database does not exist! New database created: ./database/default.pdb
 
-> enter crypto command (press h for help):
+OK database file: ./database/default.pdb
+
+@ElonM> enter crypto command (press h for help):
 ```
 
+Note that the prompt is _@ElonM_ now, so you are logged.
    
 Time for **crypto command**. That's the way you have to put cryptopass in action.
 If you press h for help:
@@ -66,20 +86,22 @@ If you press h for help:
 ```
 	 crypto commands: 
 
-	 all: 	show all valid entries for user/password.
-	 All: 	show all valid entries for user/password. (detailed)
-	 all: 	show all valid entries HINTS for user/password.
-	 dbg: 	execute debug script (just for developing).
-	 end: 	exit cryptopass application.
-	 h: 	help please!
-	 np: 	New password entry.
-	 p: 	Get a password for a given label.
-	 p?: 	Get a password for a given label. Copied to clipboard only.
-	 time: 	Calculate encryptio-decryption performance.
-	 wd: 	Print path of working directory.
+	 all: 	 show all valid entries for user/password.
+	 All: 	 show all valid entries for user/password. (detailed)
+	 all: 	 show all valid entries HINTS for user/password.
+	 dbg: 	 execute debug script (just for developing).
+	 end: 	 exit of cryptopass.
+	 h: 	     help please!
+	 logout: logout user session.
+	 np: 	 New password entry.
+	 p: 	     Get a password for a given label.
+	 p?: 	 Get a password for a given label. Copied to clipboard only.
+	 time: 	 Calculate encryptio-decryption performance.
+	 wd: 	 Print path of working directory.
 ```
 ### new entry
-Lot of interesting things to do, but I just want to store my firs password. To do that, type _np_ and press enter:
+Lot of interesting things to do, but I just want to store my firs password. 
+To do that, type _np_ and press enter:
 
 ```
 	 New password entry: 
@@ -90,6 +112,7 @@ Next steps **cryptopass** ask for fields' information. You can save only what yo
 ```
 label = gmail
 user = ElonM1971
+email = ElonM1971@gmail.com
 password = univ3rs3Conqu3r0r
 url = www.gmail.com
 hint = no clues
@@ -105,31 +128,55 @@ Just type your **hyper secret cryptopass password** (SpaceZ, for example) and pr
 To read the entry that store your _gmail_ password and you have loaded using the password _SpaceZ_:
 
 ```
-> enter crypto command (press h for help): p
+@ElonM> enter crypto command (press h for help): p
 	 get the password for a label: 
 
 @ElonM> label: gmail
 @ElonM> password: 
-                  password            date_time
-ElonM#0  univ3rs3Conqu3r0r  2018-02-06-20:16:57
+              user           password            date_time
+ElonM#0  ElonM1971  univ3rs3Conqu3r0r  2018-02-08-18:52:32
 	 password copied to clipboard!
 ```
 The extra functionality is that the password is automatically copied to the clipboard.
 
 If you don't want that cryptopass print your **hyper secret gmail password** use _p?_ command instead of _p_.
 
-### exit
-To exit of cryptopass just enter the _end_ command, so:
-
+### logout
+To logout of your user session of cryptopass just enter the _logout_ command, so:
 ```
-> enter crypto command (press h for help): end
+@ElonM> enter crypto command (press h for help): logout
+	 logging out... bye ElonM
+```
+
+### exit
+To exit of cryptopass just enter the _end_ command (you can do this logged in or not), so:
+```
+> enter console command (press h for help): end
 	 chau
 ```
 
 
+## Files
+Cryptopass works using 3 files:
+1. ./**cryptopass.json**
+    Created in installation folder, and it is used for initialize cryptopass.
+2. _working dir_/**default.udb**
+    Created in the working directory you've defined (default is ./database/),
+    and it is used to store user information. 
+    You can change the file that cryptopass read to load user information. 
+    You can use the name you want for this one.
+3. _working dir_/**default.pdb**
+    Created in the working directory you've defined (default is ./database/),
+    and it is used to store encrypted information (entries). 
+    You can change the file that cryptopass read to load encrypted information. 
+    You can use the name you want for this one.
+    
+You can manage *.udb and *.pdb you want, but it's recommended that a pair udb and 
+pdb file was stored in the same working directory. If you want to copy those to 
+another computer, just carry both with you.
 
-
-
+Several _cryptopass passwords_ can be used for each _cryptopass user_,
+and several _cryptopass users_ can share the same udb and pdb files with no security issues.
 
 
 
